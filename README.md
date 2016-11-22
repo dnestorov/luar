@@ -29,7 +29,7 @@ See golua's homepage for further installation details.
 
 # Usage
 
-This is a fork of github.com/stevedonovan/luar that runs with Lua 5.3.3 and supports FFI (https://github.com/dnestorov/luaffifb)
+This is a fork of https://github.com/stevedonovan/luar that runs with Lua 5.3.3 and supports FFI (https://github.com/dnestorov/luaffifb)
 The FFI interface is a fork from Facebook's luaffifb (https://github.com/facebook/luaffifb). The only difference is that the former builds a static library with Premake.
 
 The final results is:
