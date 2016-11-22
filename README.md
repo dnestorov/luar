@@ -24,7 +24,7 @@ Install with
     go get <repo>/luar
 
 The original Luar uses Alessandro Arzilli's [golua](https://github.com/aarzilli/golua).
-This fork of Luar uses [golua](https://github.com/dnestorov/golua).
+This fork of Luar uses D.Nestorov's [golua](https://github.com/dnestorov/golua).
 See golua's homepage for further installation details.
 
 # Usage
