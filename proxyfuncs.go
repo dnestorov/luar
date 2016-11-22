@@ -5,7 +5,7 @@ package luar
 import (
 	"reflect"
 
-	"github.com/aarzilli/golua/lua"
+	"github.com/dnestorov/golua/lua"
 )
 
 // ArrayToTable defines 'luar.array2table' when 'Init' is called.

@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/aarzilli/golua/lua"
+	"github.com/dnestorov/golua/lua"
 	"github.com/stevedonovan/luar"
 )
 

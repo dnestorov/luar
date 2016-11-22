@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/aarzilli/golua/lua"
+	"github.com/dnestorov/golua/lua"
 )
 
 // RaiseError raises a Lua error from Go code.
@@ -93,7 +93,7 @@ func copyTableToSlice(L *lua.State, t reflect.Type, idx int, visited map[uintptr
 
 	te := t.Elem()
 	for i := 1; i <= n; i++ {
-		L.RawGeti(idx, i)
+		L.RawGeti(idx, int64(i))
 		val := reflect.ValueOf(luaToGo(L, te, -1, visited))
 		if val.Interface() == nullv.Interface() {
 			val = reflect.Zero(te)
@@ -412,8 +412,8 @@ func newVisitor(L *lua.State) visitor {
 // If the value was not visited, return false.
 func (v *visitor) push(val reflect.Value) bool {
 	ptr := val.Pointer()
-	v.L.RawGeti(lua.LUA_REGISTRYINDEX, v.index)
-	v.L.RawGeti(-1, int(ptr))
+	v.L.RawGeti(lua.LUA_REGISTRYINDEX, int64(v.index))
+	v.L.RawGeti(-1, int64(ptr))
 	if v.L.IsNil(-1) {
 		// Not visited.
 		v.L.Pop(2)
@@ -426,11 +426,11 @@ func (v *visitor) push(val reflect.Value) bool {
 // Mark value on top of the stack as visited using the registry index.
 func (v *visitor) mark(val reflect.Value) {
 	ptr := val.Pointer()
-	v.L.RawGeti(lua.LUA_REGISTRYINDEX, v.index)
+	v.L.RawGeti(lua.LUA_REGISTRYINDEX, int64(v.index))
 	// Copy value on top.
 	v.L.PushValue(-2)
 	// Set value to table.
-	v.L.RawSeti(-2, int(ptr))
+	v.L.RawSeti(-2, int64(ptr))
 	v.L.Pop(1)
 }
 
@@ -1027,7 +1027,7 @@ func (lo *LuaObject) Call(args ...interface{}) (res interface{}, err error) {
 
 // Push pushes this Lua object on the stack.
 func (lo *LuaObject) Push() {
-	lo.L.RawGeti(lua.LUA_REGISTRYINDEX, lo.Ref)
+	lo.L.RawGeti(lua.LUA_REGISTRYINDEX, int64(lo.Ref))
 }
 
 // Close frees the Lua reference of this object.
