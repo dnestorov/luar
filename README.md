@@ -23,8 +23,55 @@ Install with
 
     go get <repo>/luar
 
-Luar uses Alessandro Arzilli's [golua](https://github.com/aarzilli/golua).
+The original Luar uses Alessandro Arzilli's [golua](https://github.com/aarzilli/golua).
+This fork of Luar uses [golua](https://github.com/dnestorov/golua)
 See golua's homepage for further installation details.
+
+# Usage
+
+This is a fork of github.com/stevedonovan/luar that runs with Lua 5.3.3 and supports FFI (https://github.com/dnestorov/luaffifb)
+The FFI interface is a fork from Facebook's luaffifb (https://github.com/facebook/luaffifb). The only difference is that the former builds a static library with Premake.
+
+The final results is:
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/dnestorov/luar"
+)
+
+var lcode = `
+local ffi = require("ffi")
+ffi.cdef[[
+	int printf(const char *fmt, ...);
+]]
+ffi.C.printf("Hello %s from FFI!\n", "world")
+
+print("Hello world from Lua!")
+
+Print("Hello world from Go!")
+`
+
+func main() {
+	l := luar.Init()
+	defer l.Close()
+
+	l.OpenFFI()
+
+	luar.Register(l, "", luar.Map{
+		// Go functions may be registered directly.
+		"Print": fmt.Println,
+	})
+
+	err := l.DoString(lcode)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+```
 
 # REPL
 
