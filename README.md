@@ -23,61 +23,66 @@ Install with
 
     go get <repo>/luar
 
-The original Luar uses Alessandro Arzilli's [golua](https://github.com/aarzilli/golua).
-This fork of Luar uses D.Nestorov's [golua](https://github.com/dnestorov/golua).
+Luar uses Alessandro Arzilli's [golua](https://github.com/aarzilli/golua).
 See golua's homepage for further installation details.
-
-# Usage
-
-This is a fork of https://github.com/stevedonovan/luar that runs with Lua 5.3.3 and supports FFI (https://github.com/dnestorov/luaffifb).
-The FFI interface is a fork from Facebook's luaffifb (https://github.com/facebook/luaffifb). The only difference is that the former builds a static library with Premake.
-
-The final results is:
-```go
-package main
-
-import (
-	"fmt"
-	"log"
-
-	"github.com/dnestorov/luar"
-)
-
-var lcode = `
-local ffi = require("ffi")
-ffi.cdef[[
-	int printf(const char *fmt, ...);
-]]
-ffi.C.printf("Hello %s from FFI!\n", "world")
-
-print("Hello world from Lua!")
-
-Print("Hello world from Go!")
-`
-
-func main() {
-	l := luar.Init()
-	defer l.Close()
-
-	l.OpenFFI()
-
-	luar.Register(l, "", luar.Map{
-		// Go functions may be registered directly.
-		"Print": fmt.Println,
-	})
-
-	err := l.DoString(lcode)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-```
 
 # REPL
 
 An example REPL is available in the `cmd` folder.
 
-# Issues
 
-The `GoToLua` and `LuaToGo` functions take a `reflect.Type` parameter, which is
-bad design. Sadly changing this would break backward compatibility.
+# Version 2
+
+This is a rewrite of 1.0 with extended features and a cleaner API.
+
+Warning: This is a development version, the API might change in the future.
+
+## Compatibility notice
+
+The main differences with the previous version:
+
+- The function prototypes of `GoToLua` and `LuaToGo` are simpler and do not
+require the use of reflection from the callers. The `dontproxify` argument is
+gone, use `GoToLuaProxy` to control proxification.
+
+- The `Copy*` functions and `GoLuaFunc` are gone, use `GoToLua` and `LuaToGo` instead.
+
+- Use `Register` instead of `RawRegister`.
+
+- `InitProxies` is gone since it was not needed.
+
+- The `LuaObject` and `LuaTableIter` structure fields are unexported.
+
+- LuaObject methods not only work on Lua functions but also on anything with a
+`__call` metamethods. Idem for tables and the `__index`/`__newindex`
+metamethods.
+
+- Use `NewLuaObjectFromName(L, "_G")` instead of `Global`.
+
+- `Lookup` and `Geti` gone. Instead the `Get` and `GetObject` functions are
+variadic: each subfield argument can be any valid Lua key (string, integer...).
+
+- Use `(*LuaObject) Call` instead of `(*LuaObject) Callf`. The protoype of
+`(*LuaObject) Call` has changed in a fashion similar to `GoToLua` and `LuaToGo`.
+`Types` is gone as it is no longer needed.
+
+- Register `ProxyIpairs` and `ProxyPairs` instead of calling `LuarSetup`.
+
+- Register and use `Unproxify` instead of `ArrayToTable`, `MapToTable`,
+`ProxyRaw`, `SliceToTable` and `StructToTable`.
+
+- `ComplexReal` and `ComplexImag` have been replaced by the proxy attributes
+`real` and `imag`, respectively.
+
+- `SliceSub` and `SliceAppend` have been replaced by the proxy methods
+`slice` and `append`, respectively.
+Slice proxies have the `cap` metamethod alongside `append` and `slice`.
+
+- String proxies have a `slice` method just like slice proxies. They can be
+looped rune-by-rune over with `ipairs`.
+
+The range of supported conversion has been extended:
+
+- LuaToGo can convert to interfaces and pointers with several levels of indirection.
+
+- LuaToGo can convert to non-empty maps and structs.
