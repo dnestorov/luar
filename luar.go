@@ -93,11 +93,11 @@ func (v *visitor) close() {
 // Mark value on top of the stack as visited using the registry index.
 func (v *visitor) mark(val reflect.Value) {
 	ptr := val.Pointer()
-	v.L.RawGeti(lua.LUA_REGISTRYINDEX, v.index)
+	v.L.RawGeti(lua.LUA_REGISTRYINDEX, int64(v.index))
 	// Copy value on top.
 	v.L.PushValue(-2)
 	// Set value to table.
-	v.L.RawSeti(-2, int(ptr))
+	v.L.RawSeti(-2, int64(ptr))
 	v.L.Pop(1)
 }
 
@@ -105,8 +105,8 @@ func (v *visitor) mark(val reflect.Value) {
 // If the value was not visited, return false and push nothing.
 func (v *visitor) push(val reflect.Value) bool {
 	ptr := val.Pointer()
-	v.L.RawGeti(lua.LUA_REGISTRYINDEX, v.index)
-	v.L.RawGeti(-1, int(ptr))
+	v.L.RawGeti(lua.LUA_REGISTRYINDEX, int64(v.index))
+	v.L.RawGeti(-1, int64(ptr))
 	if v.L.IsNil(-1) {
 		// Not visited.
 		v.L.Pop(2)
@@ -588,7 +588,7 @@ func copyTableToSlice(L *lua.State, idx int, v reflect.Value, visited map[uintpt
 
 	te := t.Elem()
 	for i := 1; i <= n; i++ {
-		L.RawGeti(idx, i)
+		L.RawGeti(idx, int64(i))
 		val := reflect.New(te).Elem()
 		err := luaToGo(L, -1, val, visited)
 		if err != nil {

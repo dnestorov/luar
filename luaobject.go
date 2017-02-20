@@ -232,7 +232,7 @@ func (lo *LuaObject) GetObject(subfields ...interface{}) (*LuaObject, error) {
 
 // Push pushes this LuaObject on the stack.
 func (lo *LuaObject) Push() {
-	lo.l.RawGeti(lua.LUA_REGISTRYINDEX, lo.ref)
+	lo.l.RawGeti(lua.LUA_REGISTRYINDEX, int64(lo.ref))
 }
 
 // Set sets the value at the sequence of 'subfields' with the value 'a'.
@@ -389,7 +389,7 @@ func (ti *LuaTableIter) Next(key, value interface{}) bool {
 		if ti.keyRef == lua.LUA_NOREF {
 			L.PushNil()
 		} else {
-			L.RawGeti(lua.LUA_REGISTRYINDEX, ti.keyRef)
+			L.RawGeti(lua.LUA_REGISTRYINDEX, int64(ti.keyRef))
 		}
 
 		if L.Next(-2) == 0 {
@@ -398,13 +398,13 @@ func (ti *LuaTableIter) Next(key, value interface{}) bool {
 		}
 
 	} else {
-		L.RawGeti(lua.LUA_REGISTRYINDEX, ti.iterRef)
+		L.RawGeti(lua.LUA_REGISTRYINDEX, int64(ti.iterRef))
 		ti.lo.Push()
 
 		if ti.keyRef == lua.LUA_NOREF {
 			L.PushNil()
 		} else {
-			L.RawGeti(lua.LUA_REGISTRYINDEX, ti.keyRef)
+			L.RawGeti(lua.LUA_REGISTRYINDEX, int64(ti.keyRef))
 		}
 
 		err := L.Call(2, 2)
